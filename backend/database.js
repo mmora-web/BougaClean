@@ -20,6 +20,7 @@ if (process.env.DATABASE_URL) {
         all: (sql, params, cb) => pool.query(sql.replace(/\?/g, (val, i) => `$${i + 1}`), params).then(res => cb(null, res.rows)).catch(err => cb(err)),
         serialize: (fn) => fn()
     };
+    initializeDB();
 } else {
     const sqlite3 = require('sqlite3').verbose();
     console.log('💻 Conectando a SQLite (Desarrollo)...');

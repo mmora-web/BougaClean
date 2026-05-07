@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BougaClean | Panel Colaborador</title>
+    <meta name="description" content="Panel de gestión de citas para colaboradores de BougaClean.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-icon">📝</div>
+            <h3>Notas del Servicio</h3>
+            <p style="margin-bottom: 15px; font-size: 0.85rem; color: var(--text-muted);">Agrega observaciones o comentarios sobre este servicio.</p>
+            <textarea id="notes-input" class="styled-textarea" placeholder="Escribe las notas aquí..." rows="4"></textarea>
+            <input type="hidden" id="notes-cita-id">
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeNotesModal()">Cancelar</button>
+                <button class="btn-primary" onclick="saveNotes()">Guardar Notas</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="brand-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <h2>BougaClean <span class="brand-badge">Staff</span></h2>
+        </div>
+        <div class="nav-links">
+            <button id="btn-refresh" class="btn-nav" onclick="refreshAll()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                Refrescar
+            </button>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-data">
+                    <span class="stat-value" id="stat-pendientes">0</span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔧</div>
+                <div class="stat-data">
+                    <span class="stat-value" id="stat-proceso">0</span>
+                    <span class="stat-label">En Proceso</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-data">
+                    <span class="stat-value" id="stat-completadas">0</span>
+                    <span class="stat-label">Completadas</span>
+                </div>
+            </div>
+            <div class="stat-card stat-highlight">
+                <div class="stat-icon">💰</div>
+                <div class="stat-data">
+                    <span class="stat-value" id="stat-ingresos">$0</span>
+                    <span class="stat-label">Ingresos Totales</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Breakdown -->
+        <div class="services-bar" id="services-bar">
+            <h4>Servicios Más Populares</h4>
+            <div id="services-list" class="services-list"></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <h3 class="section-title">Agenda de Citas</h3>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Fecha</label>
+                    <input type="date" id="filter-fecha" class="styled-input" onchange="fetchCitas()">
+                </div>
+                <div class="filter-group">
+                    <label>Estado</label>
+                    <select id="filter-estado" class="styled-select" onchange="fetchCitas()">
+                        <option value="Todas">Todas</option>
+                        <option value="Pendiente">Pendientes</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="Completada">Completadas</option>
+                        <option value="Cancelada">Canceladas</option>
+                    </select>
+                </div>
+                <div class="filter-group filter-search">
+                    <label>Buscar</label>
+                    <input type="text" id="filter-busqueda" class="styled-input" placeholder="Nombre, placa o marca..." oninput="debouncedSearch()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="kanban-board">
+            <div class="kanban-column" id="col-pendiente">
+                <div class="kanban-header">
+                    <span class="kanban-dot dot-pending"></span>
+                    <h3>Pendientes</h3>
+                    <span class="kanban-count" id="count-pendiente">0</span>
+                </div>
+                <div class="task-list">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="kanban-column" id="col-proceso">
+                <div class="kanban-header">
+                    <span class="kanban-dot dot-process"></span>
+                    <h3>En Proceso</h3>
+                    <span class="kanban-count" id="count-proceso">0</span>
+                </div>
+                <div class="task-list">
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+            <div class="kanban-column" id="col-completada">
+                <div class="kanban-header">
+                    <span class="kanban-dot dot-complete"></span>
+                    <h3>Completadas</h3>
+                    <span class="kanban-count" id="count-completada">0</span>
+                </div>
+                <div class="task-list">
+                    <div class="skeleton-card"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

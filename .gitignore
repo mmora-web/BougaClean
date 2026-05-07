@@ -1,0 +1,10 @@
+node_modules/
+.env
+*.sqlite
+android/
+ios/
+.DS_Store
+dist/
+build/
+bin/
+obj/

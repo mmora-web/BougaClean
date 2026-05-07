@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BougaClean | Precision Cleaning</title>
+    <meta name="description" content="Servicio premium de detallado automotriz a domicilio. Agenda tu cita en segundos.">
+    
+    <!-- PWA Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f1115">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Modal/Toast System -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="modal-box" class="modal-box">
+            <div id="modal-icon" class="modal-icon"></div>
+            <h3 id="modal-title"></h3>
+            <p id="modal-message"></p>
+            <div id="modal-actions" class="modal-actions"></div>
+        </div>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Offline Banner -->
+    <div id="offline-banner" class="offline-banner hidden">
+        <span>⚡ Sin conexión — Algunos datos pueden no estar actualizados</span>
+    </div>
+
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="logo-container">
+            <img src="assets/logo_premium.png" alt="BougaClean Logo" class="splash-logo">
+        </div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <main class="app-container">
+        
+        <!-- VISTA 1: BIENVENIDA -->
+        <section id="view-welcome" class="view-section active">
+            <div class="welcome-bg"></div>
+            <div class="welcome-content">
+                <h1 class="massive-text">LA INFINITA<br>PRECISIÓN DEL<br>LAVADO</h1>
+                <p class="subtitle">Servicio premium de detallado automotriz a domicilio.</p>
+                <button id="btn-continue-welcome" class="btn-primary btn-large mt-4" onclick="showView('auth')">CONTINUAR</button>
+            </div>
+        </section>
+
+        <!-- VISTA 2: AUTENTICACIÓN -->
+        <section id="view-auth" class="view-section hidden">
+            <div class="auth-container glass-card">
+                <h2 class="card-title">Acceso</h2>
+                <p class="card-subtitle">Ingresa o regístrate para continuar.</p>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="auth-nombre" placeholder="Tu nombre (solo si eres nuevo)" class="styled-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Correo (Usuario) *</label>
+                        <input type="email" id="auth-email" placeholder="tucorreo@email.com" class="styled-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña *</label>
+                        <input type="password" id="auth-password" placeholder="Tu contraseña secreta" class="styled-input" required>
+                    </div>
+                    <button type="submit" id="btn-login" class="btn-primary w-full mt-4">Ingresar / Registrarme</button>
+                </form>
+                <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+                    *Si tu correo no existe, crearemos tu cuenta automáticamente.
+                </p>
+            </div>
+        </section>
+
+        <!-- VISTA 3: MENU DASHBOARD -->
+        <section id="view-dashboard" class="view-section hidden">
+            <div class="dashboard-header">
+                <h2>Hola, <span id="user-greeting">Cliente</span></h2>
+                <p>¿Qué deseas hacer hoy?</p>
+                <div class="dashboard-header-actions">
+                    <button id="btn-profile" class="btn-icon" onclick="showView('profile')" title="Mi Perfil">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </button>
+                    <button id="btn-logout" class="btn-ghost" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+            
+            <div class="menu-cards-container">
+                <div class="menu-card" onclick="showView('action', 'booking')">
+                    <div class="menu-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                    </div>
+                    <h3>Sacar una cita</h3>
+                    <p>Reserva un lavado a domicilio.</p>
+                </div>
+                <div class="menu-card" onclick="showView('action', 'citas')">
+                    <div class="menu-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <h3>Ver mis citas</h3>
+                    <p>Revisa el estado o cancela.</p>
+                </div>
+                <div class="menu-card" onclick="showView('action', 'garage')">
+                    <div class="menu-icon">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </div>
+                    <h3>Mi Garage</h3>
+                    <p>Gestiona tus vehículos.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 4: ACCIONES (Reservar, Citas, Garage) -->
+        <section id="view-action" class="view-section hidden">
+            <div class="action-header">
+                <button id="btn-back-action" class="btn-secondary btn-small" onclick="showView('dashboard')">⬅ Volver al Menú</button>
+                <h2 id="action-title" style="margin-left: 20px;">Acción</h2>
+            </div>
+
+            <div class="action-content">
+                <!-- RESERVAR -->
+                <div id="panel-booking" class="action-panel hidden">
+                    <div class="glass-card">
+                        <form id="booking-form">
+                            <div class="form-group">
+                                <label for="service">Servicio</label>
+                                <select id="service" class="styled-select" onchange="calculatePrice()">
+                                    <option value="basico">Lavado Básico</option>
+                                    <option value="premium">Premium Wash</option>
+                                    <option value="detallado">Detallado Interior/Exterior</option>
+                                    <option value="pulido">Pulido y Encerado</option>
+                                </select>
+                            </div>
+                            
+                            <!-- El JS inyectará el select de vehículos aquí -->
+                            
+                            <div class="form-row mt-4">
+                                <div class="form-group half"><label>Fecha</label><input type="date" id="date" class="styled-input" required onchange="loadOccupiedSlots()"></div>
+                                <div class="form-group half"><label>Hora</label><select id="time" class="styled-select" required></select></div>
+                            </div>
+
+                            <div class="form-row mt-4">
+                                <div class="form-group w-full"><label>Dirección del domicilio</label><input type="text" id="direccion" class="styled-input" required></div>
+                            </div>
+
+                            <div class="price-estimate">
+                                <span>Tiempo est: <strong id="est-time">45 min</strong></span>
+                                <div class="price-amount">Total: <strong id="est-price">$15.00</strong></div>
+                            </div>
+                            
+                            <button type="submit" id="btn-confirm-booking" class="btn-primary w-full mt-4">Confirmar Reserva</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- MIS CITAS -->
+                <div id="panel-citas" class="action-panel hidden">
+                    <div class="glass-card" style="width: 100%;">
+                        <div id="citas-list" class="vehicle-list">
+                            <div class="skeleton-loader">
+                                <div class="skeleton-card"></div>
+                                <div class="skeleton-card"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MI GARAGE -->
+                <div id="panel-garage" class="action-panel hidden">
+                    <div class="glass-card" style="width: 100%;">
+                        <div class="card-header-flex">
+                            <button id="btn-add-vehicle" class="btn-secondary btn-small" onclick="document.getElementById('add-vehicle-form').style.display='block'">+ Agregar Auto</button>
+                        </div>
+                        
+                        <div id="vehicle-list" class="vehicle-list"></div>
+
+                        <form id="add-vehicle-form" class="mt-4" style="display: none;" onsubmit="event.preventDefault(); addVehicle();">
+                            <div class="form-row">
+                                <div class="form-group half"><input type="text" id="v-marca" placeholder="Marca" class="styled-input" required></div>
+                                <div class="form-group half"><input type="text" id="v-modelo" placeholder="Modelo" class="styled-input" required></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group third"><input type="number" id="v-año" placeholder="Año" class="styled-input" required></div>
+                                <div class="form-group third"><input type="text" id="v-color" placeholder="Color" class="styled-input" required></div>
+                                <div class="form-group third"><input type="text" id="v-placa" placeholder="Placa" class="styled-input" required></div>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn-ghost" onclick="document.getElementById('add-vehicle-form').style.display='none'">Cancelar</button>
+                                <button type="submit" class="btn-primary">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 5: PERFIL -->
+        <section id="view-profile" class="view-section hidden">
+            <div class="action-header">
+                <button id="btn-back-profile" class="btn-secondary btn-small" onclick="showView('dashboard')">⬅ Volver</button>
+                <h2 style="margin-left: 20px;">Mi Perfil</h2>
+            </div>
+            <div class="action-content">
+                <div class="glass-card profile-card">
+                    <div class="profile-avatar">
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <form id="profile-form" onsubmit="event.preventDefault(); updateProfile();">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="profile-nombre" class="styled-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="profile-email" class="styled-input" disabled>
+                        </div>
+                        <button type="submit" class="btn-primary w-full mt-4">Guardar Cambios</button>
+                    </form>
+
+                    <hr class="divider">
+
+                    <h3 class="section-title">Cambiar Contraseña</h3>
+                    <form id="password-form" onsubmit="event.preventDefault(); changePassword();">
+                        <div class="form-group">
+                            <label>Contraseña Actual</label>
+                            <input type="password" id="current-password" class="styled-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nueva Contraseña</label>
+                            <input type="password" id="new-password" class="styled-input" required minlength="4">
+                        </div>
+                        <button type="submit" class="btn-secondary w-full mt-4">Actualizar Contraseña</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <script src="script.js"></script>
+    <script>
+        // Registrar el Service Worker para la PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('Service Worker registrado con éxito.', registration.scope))
+                    .catch(error => console.log('Error al registrar Service Worker:', error));
+            });
+        }
+    </script>
+</body>
+</html>

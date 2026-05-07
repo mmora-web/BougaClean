@@ -1,6 +1,5 @@
 require('dotenv').config();
 const { Pool } = require('pg');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 let db;
@@ -22,6 +21,7 @@ if (process.env.DATABASE_URL) {
         serialize: (fn) => fn()
     };
 } else {
+    const sqlite3 = require('sqlite3').verbose();
     console.log('💻 Conectando a SQLite (Desarrollo)...');
     const dbPath = path.resolve(__dirname, 'database.sqlite');
     const sqliteDb = new sqlite3.Database(dbPath, (err) => {

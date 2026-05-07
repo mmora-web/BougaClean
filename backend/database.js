@@ -22,15 +22,18 @@ if (process.env.DATABASE_URL) {
     };
     initializeDB();
 } else {
-    const sqlite3 = require('sqlite3').verbose();
-    console.log('💻 Conectando a SQLite (Desarrollo)...');
-    const dbPath = path.resolve(__dirname, 'database.sqlite');
-    const sqliteDb = new sqlite3.Database(dbPath, (err) => {
-        if (err) console.error('Error connecting to SQLite:', err.message);
-        else initializeDB();
-    });
-
-    db = sqliteDb;
+    try {
+        const sqlite3 = require('sqlite3').verbose();
+        console.log('💻 Conectando a SQLite (Desarrollo)...');
+        const dbPath = path.resolve(__dirname, 'database.sqlite');
+        const sqliteDb = new sqlite3.Database(dbPath, (err) => {
+            if (err) console.error('Error connecting to SQLite:', err.message);
+            else initializeDB();
+        });
+        db = sqliteDb;
+    } catch (e) {
+        console.error('❌ No se pudo cargar SQLite. Asegúrate de que esté instalado para desarrollo local.');
+    }
 }
 
 function initializeDB() {

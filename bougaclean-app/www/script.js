@@ -1,5 +1,5 @@
-const hostname = '10.16.16.225';
-const API_URL = `http://${hostname}:3000/api`;
+const hostname = 'bougaclean-servidor.onrender.com';
+const API_URL = `https://${hostname}/api`;
 let token = localStorage.getItem('token');
 let user = JSON.parse(localStorage.getItem('user') || 'null');
 

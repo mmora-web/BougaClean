@@ -13,11 +13,23 @@ if (process.env.DATABASE_URL) {
         ssl: { rejectUnauthorized: false } // Requerido por la mayoría de servicios de hosting
     });
 
-    // Adaptador simple para mantener compatibilidad con los métodos de sqlite3 en el código actual
+    // Adaptador corregido para PostgreSQL: usa un contador incremental para $1, $2, $3...
     db = {
-        run: (sql, params, cb) => pool.query(sql.replace(/\?/g, (val, i) => `$${i + 1}`), params, cb),
-        get: (sql, params, cb) => pool.query(sql.replace(/\?/g, (val, i) => `$${i + 1}`), params).then(res => cb(null, res.rows[0])).catch(err => cb(err)),
-        all: (sql, params, cb) => pool.query(sql.replace(/\?/g, (val, i) => `$${i + 1}`), params).then(res => cb(null, res.rows)).catch(err => cb(err)),
+        run: (sql, params, cb) => {
+            let count = 0;
+            const pgSql = sql.replace(/\?/g, () => `$${++count}`);
+            pool.query(pgSql, params, cb);
+        },
+        get: (sql, params, cb) => {
+            let count = 0;
+            const pgSql = sql.replace(/\?/g, () => `$${++count}`);
+            pool.query(pgSql, params).then(res => cb(null, res.rows[0])).catch(err => cb(err));
+        },
+        all: (sql, params, cb) => {
+            let count = 0;
+            const pgSql = sql.replace(/\?/g, () => `$${++count}`);
+            pool.query(pgSql, params).then(res => cb(null, res.rows)).catch(err => cb(err));
+        },
         serialize: (fn) => fn()
     };
     initializeDB();
